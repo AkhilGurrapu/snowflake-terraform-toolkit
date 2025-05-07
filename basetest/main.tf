@@ -212,6 +212,25 @@ module "warehouses" {
   }
 }
 
+module "uat_shared_databases" {
+  source = "../../basetest/modules/shared_database_from_share" // Adjust path as needed
+
+  shared_db_configs = {
+    "sp_global_ext_db" = { // A logical key for this configuration
+      database_name = "SP_GLOBAL_EXT"
+      from_share    = "SPGLOBALXPRESSCLOUD.SPGLOBALXPRESSCLOUD_AWS_US_EAST_1.XF_RGAREINSURANCECOMPANY"
+      comment       = "S&P Global External data for UAT from XpressFeed share"
+      grant_imported_privileges_to_roles = [
+        "edp_uat_inv_xpressfeed_viewer" 
+        // Add other roles if needed, e.g., "ANOTHER_UAT_ROLE"
+      ]
+    }
+
+    // You could define other databases from other shares here for UAT
+    // "another_shared_db_for_uat" = { ... }
+  }
+}
+
 # TODO: When integrations become stable, will be utilized here. Currently in gap automation repo.
 # module "edp_aws_sdlc" {
 #   source                    = "modules/integrations/storage"
