@@ -1,0 +1,1 @@
+# TODO: Currently unavailable in Terraform provider. In gap automation repo.

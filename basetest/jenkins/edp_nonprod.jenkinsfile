@@ -1,0 +1,17 @@
+#!/usr/bin/env groovy
+
+library(
+  identifier: 'analytics-platform-snowflake-base@sdlc',
+  retriever: modernSCM(
+    [$class: 'GitSCMSource',
+    remote: 'git@github.com:rgare/analytics-platform-jenkins.git',
+    credentialsId: 'jenkins-autokeygen-analytics-platform-jenkins']
+  )
+)
+
+TerraformSnowflakePipeline {
+  snowflake_team_account = 'edp_nonprod'
+  envOverride = 'nonprod'
+  promptForPlanApprovalInDev = true
+  importResources = true
+}
