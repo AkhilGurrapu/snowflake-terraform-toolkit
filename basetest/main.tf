@@ -89,14 +89,33 @@ module "roles_with_privileges_and_grants" {
 }
 
 # TODO: Unravel the account usage roles below and create/assign better roles.
-module "snowflake_share_ops" {
-  source              = "./modules/roles/elevated_with_database_privileges"
-  role_name           = "SNOWFLAKE_SHARE_OPS"
-  grants              = []
-  owner_role          = "SYSOPS"
-  imported_privileges = {
-    privileges = ["IMPORTED PRIVILEGES"]
-    database   = "SNOWFLAKE"
+// In basetest/main.tf
+
+module "custom_elevated_roles" { // Renamed module instance for clarity
+  source = "./modules/roles/elevated_with_database_privileges"
+
+  elevated_roles = {
+    "SNOWFLAKE_SHARE_OPS" = {
+      comment                         = "Role for Snowflake sharing operations"
+      owner_role                      = "SYSOPS"
+      // grants                       = [] // Optional, defaults to empty list
+      imported_privileges_on_database = "SNOWFLAKE"
+      // schema_object_grants         = {} // Optional, defaults to empty map
+    }
+
+    "ACCOUNT_USAGE_VIEWER" = {
+      comment                         = "Role to view account usage data"
+      owner_role                      = "SYSOPS"
+      imported_privileges_on_database = "SNOWFLAKE"
+      schema_object_grants = {
+        "grant_select_on_all_views_in_account_usage" = {
+          database_name      = "SNOWFLAKE"
+          schema_name        = "ACCOUNT_USAGE"
+          object_type_plural = "VIEWS"
+          privileges         = ["SELECT"]
+        }
+      }
+    }
   }
 }
 
