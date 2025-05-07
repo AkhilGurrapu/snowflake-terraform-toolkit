@@ -154,12 +154,29 @@ module "account_level_databases" {
   depends_on                 = [module.functional_roles]
 }
 
-module "admin_schema" {
-  source                     = "./modules/schemas"
-  schema_name                = "ADMIN_SCH"
-  database_name              = "ADMIN_DB"
-  comment                    = "Analytics Platforms schema for account level utilities."
-  depends_on                 = [module.account_level_databases]
+module "admin_schemas" {
+  source = "./modules/schemas"
+
+  schemas_config = {
+    "ADMIN_SCH" = {
+      database_name = "ADMIN_DB"
+      comment       = "Analytics Platforms schema for account level utilities."
+      // owner_role  = "SYSADMIN" // Optional: defaults to SYSADMIN in the module
+      // usage_grant_to_roles = [] // Optional: Add roles if SYSOPS or others need USAGE on ADMIN_SCH
+    }
+    // Adding the ALERTS schema from the user's SQL example:
+    "ALERTS" = {
+      database_name = "ADMIN_DB"
+      comment       = "Schema for alerts and monitoring"
+      owner_role    = "SYSADMIN" // Explicitly SYSADMIN, or remove to use module default
+      usage_grant_to_roles = [
+        "SYSOPS",
+        "SECURITYADMIN"
+      ]
+    }
+  }
+
+  depends_on = [module.account_level_databases] // Ensure ADMIN_DB exists if managed by this module
 }
 
 module "admin_database_role" {
@@ -169,7 +186,7 @@ module "admin_database_role" {
   database_role_comment      = "Analytics Platforms database role for account level utilities."
   parent_role_name           = "SYSADMIN"
   schema_name                = "ADMIN_SCH"
-  depends_on                 = [module.admin_schema]
+  depends_on                 = [module.admin_schemas]
 }
 
 module "warehouses" {
