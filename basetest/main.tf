@@ -207,3 +207,18 @@ module "warehouses" {
 # }
 
 # TODO: IMPORT ADMIN_WH
+
+
+module "log_level_parameter" {
+  source = "./modules/account_parameters"
+
+  parameter_key   = "LOG_LEVEL"
+  parameter_value = "INFO"
+}
+
+module "another_parameter" {
+  source = "./modules/account_parameters"
+
+  parameter_key   = "ANOTHER_ACCOUNT_PARAM"
+  parameter_value = "SOME_VALUE"
+}
